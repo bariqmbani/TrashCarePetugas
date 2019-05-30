@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:background="#009A59"
+    android:padding="60dp"
+    android:orientation="vertical">
+    
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_ss"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <EditText
+        android:id="@+id/inputUsername"
+        android:layout_marginTop="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/loginedittext"
+        android:drawableLeft="@drawable/ic_person"
+        android:padding="7dp"
+        />
+
+    <EditText
+        android:id="@+id/inputPassword"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/loginedittext"
+        android:drawableLeft="@drawable/ic_lock"
+        android:padding="7dp"
+        android:inputType="textPassword"
+        />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/login_button"
+        android:text="Masuk"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:elevation="4dp"/>
+
+
+
+</LinearLayout>

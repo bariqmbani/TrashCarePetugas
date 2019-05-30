@@ -1,0 +1,177 @@
+/*
+{
+  "project_info": {
+    "project_number": "243803007086",
+    "firebase_url": "https://trash-care-82900.firebaseio.com",
+    "project_id": "trash-care-82900",
+    "storage_bucket": "trash-care-82900.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243803007086:android:90d7473341bcef6a",
+        "android_client_info": {
+          "package_name": "com.unpad.trashcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO1C3Lxd0U8PUVuvfTCeYWvaPOclmZ7DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}*/
+
+{
+  "project_info": {
+    "project_number": "243803007086",
+    "firebase_url": "https://trash-care-82900.firebaseio.com",
+    "project_id": "trash-care-82900",
+    "storage_bucket": "trash-care-82900.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243803007086:android:15438b9e124ca66f",
+        "android_client_info": {
+          "package_name": "com.example.trashcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243803007086-c7dm6dqdaabca50qaieibic5b25ciq3o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trashcare",
+            "certificate_hash": "e6284628cb6203fceeb756ea4e50a39f0c9f9dae"
+          }
+        },
+        {
+          "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO1C3Lxd0U8PUVuvfTCeYWvaPOclmZ7DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243803007086:android:90d7473341bcef6a",
+        "android_client_info": {
+          "package_name": "com.unpad.trashcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO1C3Lxd0U8PUVuvfTCeYWvaPOclmZ7DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243803007086:android:09cd543c8f4d3b4b",
+        "android_client_info": {
+          "package_name": "com.unpad.trashcareadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO1C3Lxd0U8PUVuvfTCeYWvaPOclmZ7DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243803007086:android:21b79442b50aff59",
+        "android_client_info": {
+          "package_name": "com.unpad.trashcarepetugas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO1C3Lxd0U8PUVuvfTCeYWvaPOclmZ7DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

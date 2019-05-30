@@ -1,0 +1,97 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_to_refresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MainActivity"
+    android:padding="16dp"
+    tools:showIn="@layout/app_bar_main">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_marginTop="40dp"
+        android:id="@+id/ivProfile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerHorizontal="true"
+        app:civ_border_color="@color/colorPrimary"
+        app:civ_border_width="2dp"
+        android:src="@drawable/ic_person"
+        />
+
+    <TextView
+        android:id="@+id/tvNama"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ini Nama"
+        android:layout_below="@id/ivProfile"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:textSize="16dp"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/tvAlamat"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ini alamat rumah saya"
+        android:layout_below="@id/tvNama"
+        android:textColor="#000"
+        android:textSize="16dp"
+        android:layout_marginTop="6dp"/>
+
+    <Button
+        android:id="@+id/btnBukaMaps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvAlamat"
+        android:background="@drawable/angkut_button"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:text="Buka\nMaps"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingEnd="60dp"
+        android:paddingStart="60dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/btnBukaMaps"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp">
+
+        <Button
+            android:id="@+id/btnArtikel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/login_button"
+            android:text="Artikel"
+            android:drawableTop="@drawable/ic_library"
+            android:padding="16dp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:layout_marginRight="15dp"
+            />
+
+        <Button
+            android:id="@+id/btnFeedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/login_button"
+            android:text="Feedback"
+            android:drawableTop="@drawable/ic_comment"
+            android:padding="16dp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>
