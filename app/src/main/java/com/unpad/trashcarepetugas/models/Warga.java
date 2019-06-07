@@ -57,4 +57,15 @@ public class Warga {
     public void setId_warga(String id_warga) {
         this.id_warga = id_warga;
     }
+
+    @Override
+    public String toString() {
+        return "Warga{" +
+                "alamat='" + alamat + '\'' +
+                ", nama='" + nama + '\'' +
+                ", no_telp='" + no_telp + '\'' +
+                ", password='" + password + '\'' +
+                ", id_warga='" + id_warga + '\'' +
+                '}';
+    }
 }
