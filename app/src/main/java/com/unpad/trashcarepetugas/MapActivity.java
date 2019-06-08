@@ -2,6 +2,7 @@ package com.unpad.trashcarepetugas;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,6 +21,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -29,9 +32,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.maps.android.clustering.ClusterManager;
 import com.unpad.trashcarepetugas.adapters.WargaRecyclerAdapter;
+import com.unpad.trashcarepetugas.models.ClusterMarker;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
+import com.unpad.trashcarepetugas.util.MyClusterManagerRenderer;
 
 import java.util.ArrayList;
 
@@ -65,6 +71,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LatLngBounds mMapBoundary;
     private LokasiPetugas mPosisiPetugas;
 
+    private ClusterManager mClusterManager;
+    private MyClusterManagerRenderer mClusterManagerRenderer;
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,40 +102,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-
-    private void setCameraView() {
-
-        db.collection("Lokasi Petugas").document(FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
-                    mPosisiPetugas = documentSnapshot.toObject(LokasiPetugas.class);
-                    Log.d(TAG,"ambil data success\n" + mPosisiPetugas.getGeo_point());
-                    Log.d(TAG, mPosisiPetugas.getGeo_point().getLatitude() + "\n" + mPosisiPetugas.getGeo_point().getLatitude());
-                    // Set a boundary to start
-                    double bottomBoundary = mPosisiPetugas.getGeo_point().getLatitude() - .002;
-                    double leftBoundary = mPosisiPetugas.getGeo_point().getLongitude() - .002;
-                    double topBoundary = mPosisiPetugas.getGeo_point().getLatitude() + .002;
-                    double rightBoundary = mPosisiPetugas.getGeo_point().getLongitude() + .002;
-
-                    mMapBoundary = new LatLngBounds(
-                            new LatLng(bottomBoundary, leftBoundary),
-                            new LatLng(topBoundary, rightBoundary)
-                    );
-
-                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0));
-                }
-            }
-        });
-
-
-    }
-
-    private void setPosisiPetugas() {
-    }
-
-
-
     private void initGoogleMap(Bundle savedInstanceState) {
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
@@ -147,12 +123,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (task.isSuccessful()) {
                     mWargaList = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
-//                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        Log.d(TAG, document.getId() + " => " + document.getData());
                         LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
                         mWargaList.add(lokasiWarga);
-                        getLokasiWarga(lokasiWarga);
-                        Log.d(TAG,"nama: " + lokasiWarga.getWarga().getNama());
-                        Log.d(TAG, "latitude: " + lokasiWarga.getGeo_point().getLatitude() + "\nlongitude: " + lokasiWarga.getGeo_point().getLongitude());
                     }
                     mWargaRecyclerAdapter = new WargaRecyclerAdapter(mWargaList);
                     mWargaListRecyclerView.setAdapter(mWargaRecyclerAdapter);
@@ -177,6 +150,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
+    }
+
+    private void setCameraView() {
+
+        db.collection("Lokasi Petugas").document(FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists()) {
+                    mPosisiPetugas = documentSnapshot.toObject(LokasiPetugas.class);
+                    Log.d(TAG,"ambil data success\n" + mPosisiPetugas.getGeo_point());
+                    Log.d(TAG, mPosisiPetugas.getGeo_point().getLatitude() + "\n" + mPosisiPetugas.getGeo_point().getLatitude());
+                    // Set a boundary to start
+                    double bottomBoundary = mPosisiPetugas.getGeo_point().getLatitude() - .0015;
+                    double leftBoundary = mPosisiPetugas.getGeo_point().getLongitude() - .0015;
+                    double topBoundary = mPosisiPetugas.getGeo_point().getLatitude() + .0015;
+                    double rightBoundary = mPosisiPetugas.getGeo_point().getLongitude() + .0015;
+
+                    mMapBoundary = new LatLngBounds(
+                            new LatLng(bottomBoundary, leftBoundary),
+                            new LatLng(topBoundary, rightBoundary)
+                    );
+
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0));
+                }
+            }
+        });
+
+
+    }
+
+    private void setPosisiPetugas() {
     }
 
     @Override
@@ -211,13 +215,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
+    public void onMapReady(final GoogleMap map) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        setCameraView();
-        mGoogleMap = map;
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = map.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.mapstyle));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+        db.collection("Lokasi Warga").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    mWargaList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
+                        mWargaList.add(lokasiWarga);
+                        getLokasiWarga(lokasiWarga);
+                        map.addMarker(new MarkerOptions()
+                                .position(new LatLng(lokasiWarga.getGeo_point().getLatitude(), lokasiWarga.getGeo_point().getLongitude()))
+                                .title(lokasiWarga.getWarga().getNama())
+                                .snippet(lokasiWarga.getWarga().getAlamat()));
+                        Log.d(TAG,"nama: " + lokasiWarga.getWarga().getNama());
+                        Log.d(TAG, "latitude: " + lokasiWarga.getGeo_point().getLatitude() + "\nlongitude: " + lokasiWarga.getGeo_point().getLongitude());
+                    }
+                } else {
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
         map.setMyLocationEnabled(true);
+        mGoogleMap = map;
+        setCameraView();
     }
 
     @Override

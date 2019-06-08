@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity
             //DocumentReference userRef = db.collection("Lokasi Warga").document(FirebaseDatabase.getInstance().getReference().child("warga").toString());
 
             //DocumentReference wargaRef = db.collection("warga").get();
-            DocumentReference userRef = db.collection("patugas").document(id);
+            DocumentReference userRef = db.collection("petugas").document(id);
 
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
