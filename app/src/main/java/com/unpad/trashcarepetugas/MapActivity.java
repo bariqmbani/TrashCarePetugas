@@ -1,6 +1,7 @@
 package com.unpad.trashcarepetugas;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -11,6 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,22 +42,27 @@ import com.unpad.trashcarepetugas.models.ClusterMarker;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
 import com.unpad.trashcarepetugas.util.MyClusterManagerRenderer;
+import com.unpad.trashcarepetugas.util.ViewWeightAnimationWrapper;
 
 import java.util.ArrayList;
 
 import static com.unpad.trashcarepetugas.util.Constants.MAPVIEW_BUNDLE_KEY;
 
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     private static final String TAG = "MapActivity";
+    private static final int MAP_LAYOUT_STATE_CONTRACTED = 0;
+    private static final int MAP_LAYOUT_STATE_EXPANDED = 1;
 
     //widgets
     private RecyclerView mWargaListRecyclerView;
     private MapView mMapView;
-//    private LokasiWarga mLokasiWarga;
+    private RelativeLayout mMapContainer;
+
 
     TextView nama, alamat;
+    ImageButton fullscreen;
     String id;
 
 
@@ -62,7 +71,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ArrayList<LokasiWarga> mLokasiWarga = new ArrayList<>();
     private WargaRecyclerAdapter mWargaRecyclerAdapter;
     private FirebaseFirestore db;
-
+    private int mMapLayoutState = 0;
 
     //    private LokasiWarga mLokasiWarga;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -86,6 +95,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         id = getIntent().getExtras().getString("ID");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        mMapContainer = findViewById(R.id.map_container);
         mWargaListRecyclerView = findViewById(R.id.warga_list_recycler_view);
         mMapView = findViewById(R.id.warga_list_map);
 
@@ -94,6 +104,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mWargaListRecyclerView.setLayoutManager(layoutManager);
+
+        fullscreen = findViewById(R.id.btn_full_screen_map);
+        fullscreen.setOnClickListener(this);
 
         initWargaListRecyclerView();
         initGoogleMap(savedInstanceState);
@@ -176,11 +189,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
-
-
-    }
-
-    private void setPosisiPetugas() {
     }
 
     @Override
@@ -275,23 +283,61 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onLowMemory();
         mMapView.onLowMemory();
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_full_screen_map:{
+
+                if(mMapLayoutState == MAP_LAYOUT_STATE_CONTRACTED){
+                    mMapLayoutState = MAP_LAYOUT_STATE_EXPANDED;
+                    expandMapAnimation();
+                }
+                else if(mMapLayoutState == MAP_LAYOUT_STATE_EXPANDED){
+                    mMapLayoutState = MAP_LAYOUT_STATE_CONTRACTED;
+                    contractMapAnimation();
+                }
+                break;
+            }
+
+        }
+    }
+
+    private void expandMapAnimation(){
+        ViewWeightAnimationWrapper mapAnimationWrapper = new ViewWeightAnimationWrapper(mMapContainer);
+        ObjectAnimator mapAnimation = ObjectAnimator.ofFloat(mapAnimationWrapper,
+                "weight",
+                50,
+                100);
+        mapAnimation.setDuration(800);
+
+        ViewWeightAnimationWrapper recyclerAnimationWrapper = new ViewWeightAnimationWrapper(mWargaListRecyclerView);
+        ObjectAnimator recyclerAnimation = ObjectAnimator.ofFloat(recyclerAnimationWrapper,
+                "weight",
+                50,
+                0);
+        recyclerAnimation.setDuration(800);
+
+        recyclerAnimation.start();
+        mapAnimation.start();
+    }
+
+    private void contractMapAnimation(){
+        ViewWeightAnimationWrapper mapAnimationWrapper = new ViewWeightAnimationWrapper(mMapContainer);
+        ObjectAnimator mapAnimation = ObjectAnimator.ofFloat(mapAnimationWrapper,
+                "weight",
+                100,
+                50);
+        mapAnimation.setDuration(800);
+
+        ViewWeightAnimationWrapper recyclerAnimationWrapper = new ViewWeightAnimationWrapper(mWargaListRecyclerView);
+        ObjectAnimator recyclerAnimation = ObjectAnimator.ofFloat(recyclerAnimationWrapper,
+                "weight",
+                0,
+                50);
+        recyclerAnimation.setDuration(800);
+
+        recyclerAnimation.start();
+        mapAnimation.start();
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
