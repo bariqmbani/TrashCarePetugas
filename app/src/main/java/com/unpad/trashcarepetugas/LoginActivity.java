@@ -60,21 +60,24 @@ public class LoginActivity extends AppCompatActivity {
                         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                /*Petugas petugas = documentSnapshot.toObject(Petugas.class);
+                                ((UserClient)(getApplicationContext())).setPetugas(petugas);*/
                                 if (documentSnapshot.exists()) {
                                     Petugas user = documentSnapshot.toObject(Petugas.class);
+                                    ((UserClient)(getApplicationContext())).setPetugas(user);
                                     if (user.getPassword().equals(etPassword.getText().toString())) {
+
                                         mAuth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                             @Override
                                             public void onComplete(@NonNull Task<AuthResult> task) {
                                                 Log.d(TAG, "signIn Success, Uid: " + FirebaseAuth.getInstance().getUid());
                                                 FirebaseUser user = mAuth.getCurrentUser();
                                                 Toast.makeText(getApplicationContext(), "welcome", Toast.LENGTH_SHORT).show();
-                                                Intent it = new Intent(LoginActivity.this,MainActivity.class);
-                                                it.putExtra("ID",etUsername.getText().toString());
+                                                Intent it = new Intent(LoginActivity.this, MainActivity.class);
+                                                it.putExtra("ID", etUsername.getText().toString());
                                                 startActivity(it);
                                             }
                                         });
-
                                     } else {
                                         Toast.makeText(LoginActivity.this, "Passsword Mismatching", Toast.LENGTH_SHORT).show();
                                     }

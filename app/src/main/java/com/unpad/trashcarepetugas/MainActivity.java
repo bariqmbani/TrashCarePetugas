@@ -1,6 +1,7 @@
 package com.unpad.trashcarepetugas;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,12 +34,14 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.Petugas;
+import com.unpad.trashcarepetugas.services.LocationService;
 
 import static com.unpad.trashcarepetugas.util.Constants.ERROR_DIALOG_REQUEST;
 import static com.unpad.trashcarepetugas.util.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
@@ -120,18 +123,14 @@ public class MainActivity extends AppCompatActivity
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
-                Intent out = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(out);
+                logOut();
             }
         });
 
         imgLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
-                Intent out = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(out);
+                logOut();
             }
         });
 
@@ -139,6 +138,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 //    @SuppressWarnings("StatementWithEmptyBody")
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -153,14 +153,45 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void logOut() {
+        Toast.makeText(MainActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
+        FirebaseAuth.getInstance().signOut();
+        Intent out = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(out);
+        finish();
+    }
+
+    private void startLocationService(){
+        if(!isLocationServiceRunning()){
+            Intent serviceIntent = new Intent(this, LocationService.class);
+//        this.startService(serviceIntent);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+
+                MainActivity.this.startForegroundService(serviceIntent);
+            }else{
+                startService(serviceIntent);
+            }
+        }
+    }
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if("com.codingwithmitch.googledirectionstest.services.LocationService".equals(service.service.getClassName())) {
+                Log.d(TAG, "isLocationServiceRunning: location service is already running.");
+                return true;
+            }
+        }
+        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        return false;
+    }
+
     private void getUserDetails() {
 
         if (mLokasiPetugas == null) {
             mLokasiPetugas = new LokasiPetugas();
 
-            //DocumentReference userRef = db.collection("Lokasi Warga").document(FirebaseDatabase.getInstance().getReference().child("warga").toString());
-
-            //DocumentReference wargaRef = db.collection("warga").get();
             DocumentReference userRef = db.collection("petugas").document(id);
 
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -171,8 +202,8 @@ public class MainActivity extends AppCompatActivity
 
                         Petugas petugas = task.getResult().toObject(Petugas.class);
                         mLokasiPetugas.setPetugas(petugas);
+                        ((UserClient)(getApplicationContext())).setPetugas(petugas);
                         getLastKnownLocation();
-//                        db.collection("Lokasi Warga").document(id).collection("Data Warga").document(id).set(warga);
                     }
                 }
             });
@@ -201,6 +232,7 @@ public class MainActivity extends AppCompatActivity
                     mLokasiPetugas.setGeo_point(geoPoint);
                     mLokasiPetugas.setTimestamp(null);
                     saveUserLocation();
+                    startLocationService();
                 }
             }
         });
@@ -213,7 +245,7 @@ public class MainActivity extends AppCompatActivity
 
             //DocumentReference wargaRef = db.collection("warga").get();
 
-            DocumentReference locationRef = db.collection("Lokasi Petugas").document(id);
+            DocumentReference locationRef = db.collection("Lokasi Petugas").document(FirebaseAuth.getInstance().getUid());
 
             locationRef.set(mLokasiPetugas).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
