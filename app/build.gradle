@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+
 
 android {
     compileSdkVersion 27
@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    /*compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }*/
 }
 
 dependencies {
@@ -42,9 +46,11 @@ dependencies {
 
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
 
-
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
+
+    implementation 'com.google.maps:google-maps-services:0.2.11'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
 }
 apply plugin: 'com.google.gms.google-services'

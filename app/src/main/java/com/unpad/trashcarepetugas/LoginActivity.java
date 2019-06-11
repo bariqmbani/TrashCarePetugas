@@ -60,8 +60,6 @@ public class LoginActivity extends AppCompatActivity {
                         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                /*Petugas petugas = documentSnapshot.toObject(Petugas.class);
-                                ((UserClient)(getApplicationContext())).setPetugas(petugas);*/
                                 if (documentSnapshot.exists()) {
                                     Petugas user = documentSnapshot.toObject(Petugas.class);
                                     ((UserClient)(getApplicationContext())).setPetugas(user);

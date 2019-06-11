@@ -2,6 +2,7 @@ package com.unpad.trashcarepetugas.adapters;
 
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,10 @@ import android.widget.TextView;
 
 import com.unpad.trashcarepetugas.R;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
-//import com.unpad.trashcarepetugas.models.Warga;
 
 import java.util.ArrayList;
+
+//import com.unpad.trashcarepetugas.models.Warga;
 
 public class WargaRecyclerAdapter extends RecyclerView.Adapter<WargaRecyclerAdapter.ViewHolder>{
 
@@ -50,16 +52,15 @@ public class WargaRecyclerAdapter extends RecyclerView.Adapter<WargaRecyclerAdap
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         TextView nama, alamat;
+        CardView cardView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             nama = itemView.findViewById(R.id.nama);
             alamat = itemView.findViewById(R.id.alamat);
+            cardView = itemView.findViewById(R.id.card_view);
         }
-
-
     }
-
 }
 
 

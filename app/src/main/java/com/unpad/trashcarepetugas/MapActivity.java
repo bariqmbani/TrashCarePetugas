@@ -2,12 +2,14 @@ package com.unpad.trashcarepetugas;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -26,22 +29,23 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
+import com.google.maps.model.DirectionsResult;
 import com.unpad.trashcarepetugas.adapters.WargaRecyclerAdapter;
-import com.unpad.trashcarepetugas.models.ClusterMarker;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
-import com.unpad.trashcarepetugas.util.MyClusterManagerRenderer;
 import com.unpad.trashcarepetugas.util.ViewWeightAnimationWrapper;
 
 import java.util.ArrayList;
@@ -49,7 +53,8 @@ import java.util.ArrayList;
 import static com.unpad.trashcarepetugas.util.Constants.MAPVIEW_BUNDLE_KEY;
 
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
+public class MapActivity extends AppCompatActivity
+        implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private static final String TAG = "MapActivity";
     private static final int MAP_LAYOUT_STATE_CONTRACTED = 0;
@@ -79,10 +84,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap mGoogleMap;
     private LatLngBounds mMapBoundary;
     private LokasiPetugas mPosisiPetugas;
+    private GeoApiContext mGeoApiContext = null;
 
-    private ClusterManager mClusterManager;
+
+    /*private ClusterManager mClusterManager;
     private MyClusterManagerRenderer mClusterManagerRenderer;
-    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();*/
 
 
     @Override
@@ -110,8 +117,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         initWargaListRecyclerView();
         initGoogleMap(savedInstanceState);
-//        setPosisiPetugas();
-
 
     }
 
@@ -125,8 +130,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         mMapView.onCreate(mapViewBundle);
-
         mMapView.getMapAsync(this);
+
+        if (mGeoApiContext == null) {
+            mGeoApiContext = new GeoApiContext.Builder()
+                    .apiKey(getString(R.string.google_maps_api_key))
+                    .build();
+        }
+    }
+
+    private void calculateDirections(Marker marker){
+        Log.d(TAG, "calculateDirections: calculating directions.");
+
+        com.google.maps.model.LatLng destination = new com.google.maps.model.LatLng(
+                marker.getPosition().latitude,
+                marker.getPosition().longitude
+        );
+        DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
+
+        directions.alternatives(true);
+        directions.origin(
+                new com.google.maps.model.LatLng(
+                        mPosisiPetugas.getGeo_point().getLatitude(),
+                        mPosisiPetugas.getGeo_point().getLongitude()
+                )
+        );
+        Log.d(TAG, "calculateDirections: destination: " + destination.toString());
+        directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
+            @Override
+            public void onResult(DirectionsResult result) {
+                Log.d(TAG, "calculateDirections: routes: " + result.routes[0].toString());
+                Log.d(TAG, "calculateDirections: duration: " + result.routes[0].legs[0].duration);
+                Log.d(TAG, "calculateDirections: distance: " + result.routes[0].legs[0].distance);
+                Log.d(TAG, "calculateDirections: geocodedWayPoints: " + result.geocodedWaypoints[0].toString());
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                Log.e(TAG, "calculateDirections: Failed to get directions: " + e.getMessage() );
+                Toast.makeText(MapActivity.this,"Google API melebihi limit", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initWargaListRecyclerView() {
@@ -146,20 +190,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
 //                    Toast.makeText(this, "gagal", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void getLokasiWarga(LokasiWarga lokasiWarga) {
-        DocumentReference lokasiRef = db.collection("Lokasi Warga").document();
-        lokasiRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    if (task.getResult().toObject(LokasiWarga.class) != null) {
-                        mLokasiWarga.add(task.getResult().toObject(LokasiWarga.class));
-                    }
                 }
             }
         });
@@ -248,7 +278,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
                         mWargaList.add(lokasiWarga);
-                        getLokasiWarga(lokasiWarga);
                         map.addMarker(new MarkerOptions()
                                 .position(new LatLng(lokasiWarga.getGeo_point().getLatitude(), lokasiWarga.getGeo_point().getLongitude()))
                                 .title(lokasiWarga.getWarga().getNama())
@@ -264,6 +293,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setMyLocationEnabled(true);
         mGoogleMap = map;
         setCameraView();
+        map.setOnInfoWindowClickListener(this);
     }
 
     @Override
@@ -339,5 +369,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         recyclerAnimation.start();
         mapAnimation.start();
+    }
+
+    @Override
+    public void onInfoWindowClick(final Marker marker) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+        builder.setMessage("Tunjukkan rute jalan ke " + marker.getSnippet() + "?")
+                .setCancelable(true)
+                .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        calculateDirections(marker);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 }
