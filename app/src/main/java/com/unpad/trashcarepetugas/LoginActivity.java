@@ -21,8 +21,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.unpad.trashcarepetugas.models.Petugas;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -70,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<AuthResult> task) {
                                                 Log.d(TAG, "signIn Success, Uid: " + FirebaseAuth.getInstance().getUid());
                                                 FirebaseUser user = mAuth.getCurrentUser();
+                                                petugasToken();
                                                 Toast.makeText(getApplicationContext(), "welcome", Toast.LENGTH_SHORT).show();
                                                 Intent it = new Intent(LoginActivity.this, MainActivity.class);
                                                 it.putExtra("ID", etUsername.getText().toString());
@@ -91,4 +96,29 @@ public class LoginActivity extends AppCompatActivity {
                 }
         });
     }
+
+    private void petugasToken() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        Log.d(TAG, "Token petugas: " + token);
+
+                        Map<String, Object> userId = new HashMap<>();
+                        userId.put("uid", mAuth.getInstance().getUid());
+                        userId.put("id_petugas", etUsername.getText().toString());
+
+                        db.collection("Token Petugas").document(token).set(userId);
+
+                    }
+                });
+    }
+
 }

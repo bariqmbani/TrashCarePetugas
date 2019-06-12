@@ -39,6 +39,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.Petugas;
 import com.unpad.trashcarepetugas.services.LocationService;
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationClient;
     private LokasiPetugas mLokasiPetugas;
 
+    private FirebaseFunctions mFunctions;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         checkMapServices();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-
+        mFunctions = FirebaseFunctions.getInstance();
         db = FirebaseFirestore.getInstance();
         id = getIntent().getExtras().getString("ID");
         Log.d(TAG, id);
@@ -133,7 +136,6 @@ public class MainActivity extends AppCompatActivity
                 logOut();
             }
         });
-
 
     }
 
