@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -35,6 +36,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -42,10 +45,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
+import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.model.DirectionsResult;
 import com.unpad.trashcarepetugas.adapters.WargaRecyclerAdapter;
+import com.unpad.trashcarepetugas.models.ClusterMarker;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
+import com.unpad.trashcarepetugas.util.MyClusterManagerRenderer;
 import com.unpad.trashcarepetugas.util.ViewWeightAnimationWrapper;
 
 import java.util.ArrayList;
@@ -59,6 +65,8 @@ public class MapActivity extends AppCompatActivity
     private static final String TAG = "MapActivity";
     private static final int MAP_LAYOUT_STATE_CONTRACTED = 0;
     private static final int MAP_LAYOUT_STATE_EXPANDED = 1;
+    private static final int LOCATION_UPDATE_INTERVAL = 1000;
+
 
     //widgets
     private RecyclerView mWargaListRecyclerView;
@@ -72,9 +80,9 @@ public class MapActivity extends AppCompatActivity
 
 
     //vars
-    private ArrayList<LokasiWarga> mWargaList = new ArrayList<>();
-    private ArrayList<LokasiWarga> mLokasiWarga = new ArrayList<>();
+    private ArrayList<LokasiWarga> wargas = new ArrayList<>();
     private WargaRecyclerAdapter mWargaRecyclerAdapter;
+    
     private FirebaseFirestore db;
     private int mMapLayoutState = 0;
 
@@ -86,10 +94,13 @@ public class MapActivity extends AppCompatActivity
     private LokasiPetugas mPosisiPetugas;
     private GeoApiContext mGeoApiContext = null;
 
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable;
 
-    /*private ClusterManager mClusterManager;
+
+    private ClusterManager mClusterManager;
     private MyClusterManagerRenderer mClusterManagerRenderer;
-    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();*/
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
 
     @Override
@@ -178,13 +189,15 @@ public class MapActivity extends AppCompatActivity
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    mWargaList = new ArrayList<>();
+                    wargas = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Log.d(TAG, document.getId() + " => " + document.getData());
                         LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
-                        mWargaList.add(lokasiWarga);
+                        if (lokasiWarga.getWarga().isRequest() != false) {
+                            wargas.add(lokasiWarga);
+                        }
                     }
-                    mWargaRecyclerAdapter = new WargaRecyclerAdapter(mWargaList);
+                    mWargaRecyclerAdapter = new WargaRecyclerAdapter(wargas);
                     mWargaListRecyclerView.setAdapter(mWargaRecyclerAdapter);
                     mWargaRecyclerAdapter.notifyDataSetChanged();
                 } else {
@@ -257,6 +270,7 @@ public class MapActivity extends AppCompatActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        // Maps Style
         try {
             // Customise the styling of the base map using a JSON object defined
             // in a raw resource file.
@@ -270,28 +284,32 @@ public class MapActivity extends AppCompatActivity
         } catch (Resources.NotFoundException e) {
             Log.e(TAG, "Can't find style. Error: ", e);
         }
+
         db.collection("Lokasi Warga").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    mWargaList = new ArrayList<>();
+                    wargas = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
-                        mWargaList.add(lokasiWarga);
-                        map.addMarker(new MarkerOptions()
-                                .position(new LatLng(lokasiWarga.getGeo_point().getLatitude(), lokasiWarga.getGeo_point().getLongitude()))
-                                .title(lokasiWarga.getWarga().getNama())
-                                .snippet(lokasiWarga.getWarga().getAlamat()));
-                        Log.d(TAG,"nama: " + lokasiWarga.getWarga().getNama());
-                        Log.d(TAG, "latitude: " + lokasiWarga.getGeo_point().getLatitude() + "\nlongitude: " + lokasiWarga.getGeo_point().getLongitude());
+                        if (lokasiWarga.getWarga().isRequest() != false) {
+                            wargas.add(lokasiWarga);
+
+                            //this is default marker
+                            map.addMarker(new MarkerOptions()
+                                    .position(new LatLng(lokasiWarga.getGeo_point().getLatitude(), lokasiWarga.getGeo_point().getLongitude()))
+                                    .title(lokasiWarga.getWarga().getNama())
+                                    .snippet(lokasiWarga.getWarga().getAlamat()));
+                            Log.d(TAG,"nama: " + lokasiWarga.getWarga().getNama());
+                            Log.d(TAG, "latitude: " + lokasiWarga.getGeo_point().getLatitude() + "\nlongitude: " + lokasiWarga.getGeo_point().getLongitude());
+
+                        }
                     }
-                } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
                 }
             }
         });
-        map.setMyLocationEnabled(true);
         mGoogleMap = map;
+        map.setMyLocationEnabled(true);
         setCameraView();
         map.setOnInfoWindowClickListener(this);
     }
@@ -371,14 +389,45 @@ public class MapActivity extends AppCompatActivity
         mapAnimation.start();
     }
 
+
     @Override
     public void onInfoWindowClick(final Marker marker) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-        builder.setMessage("Tunjukkan rute jalan ke " + marker.getSnippet() + "?")
+        builder.setMessage("Anda ingin mengangkut sampah di " + marker.getSnippet() + "?")
                 .setCancelable(true)
                 .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        calculateDirections(marker);
+//                        calculateDirections(marker);
+                        CollectionReference lokasiRef = db.collection("Lokasi Warga");
+                        lokasiRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    wargas = new ArrayList<>();
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
+                                        LatLng position = new LatLng(lokasiWarga.getGeo_point().getLatitude(),
+                                                lokasiWarga.getGeo_point().getLongitude());
+                                        Log.d(TAG, document.getId() + lokasiWarga.getWarga().getNama() + position + "\n");
+                                        wargas.add(lokasiWarga);
+                                        if (position.equals(marker.getPosition())) {
+                                            String idWarga = lokasiWarga.getWarga().getId_warga();
+                                            Log.d(TAG, "id warga: " + idWarga);
+                                            final DocumentReference wargaRef = db.collection("warga").document(idWarga);
+                                            wargaRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                    if (documentSnapshot.exists()) {
+                                                        wargaRef.update("request", false);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        marker.remove();
                         dialog.dismiss();
                     }
                 })

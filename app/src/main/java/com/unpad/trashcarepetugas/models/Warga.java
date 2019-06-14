@@ -6,13 +6,15 @@ public class Warga {
     private String no_telp;
     private String password;
     private String id_warga;
+    private boolean request;
 
-    public Warga(String alamat, String nama, String no_telp, String password, String id_warga) {
+    public Warga(String alamat, String nama, String no_telp, String password, String id_warga, boolean  request) {
         this.alamat = alamat;
         this.nama = nama;
         this.no_telp = no_telp;
         this.password = password;
         this.id_warga = id_warga;
+        this.request = request;
     }
 
     public Warga() {
@@ -58,6 +60,14 @@ public class Warga {
         this.id_warga = id_warga;
     }
 
+    public boolean isRequest() {
+        return request;
+    }
+
+    public void setRequest(boolean request) {
+        this.request = request;
+    }
+
     @Override
     public String toString() {
         return "Warga{" +
@@ -66,6 +76,7 @@ public class Warga {
                 ", no_telp='" + no_telp + '\'' +
                 ", password='" + password + '\'' +
                 ", id_warga='" + id_warga + '\'' +
+                ", request=" + request +
                 '}';
     }
 }
