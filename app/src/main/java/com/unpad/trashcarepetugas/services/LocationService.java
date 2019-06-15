@@ -25,7 +25,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -118,7 +117,7 @@ public class LocationService extends Service {
         try{
             DocumentReference locationRef = FirebaseFirestore.getInstance()
                     .collection("Lokasi Petugas")
-                    .document(FirebaseAuth.getInstance().getUid());
+                    .document(((UserClient)(getApplicationContext())).getPetugas().getId_petugas());
 
             locationRef.set(lokasiPetugas).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

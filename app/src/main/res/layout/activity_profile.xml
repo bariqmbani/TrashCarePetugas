@@ -109,13 +109,14 @@
                 android:textSize="18sp"/>
 
             <TextView
+                android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="blablabla@gmail.com"
+                android:layout_marginLeft="8dp"
                 android:fontFamily="@font/motsterrat_regular"
-                android:textColor="#000"
-                android:layout_marginLeft="8dp"/>
-    </LinearLayout>
+                android:text="blablabla@gmail.com"
+                android:textColor="#000" />
+        </LinearLayout>
     </RelativeLayout>
 
 </RelativeLayout>

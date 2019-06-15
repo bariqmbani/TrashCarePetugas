@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -35,7 +34,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,13 +43,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
-import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.model.DirectionsResult;
 import com.unpad.trashcarepetugas.adapters.WargaRecyclerAdapter;
-import com.unpad.trashcarepetugas.models.ClusterMarker;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
-import com.unpad.trashcarepetugas.util.MyClusterManagerRenderer;
 import com.unpad.trashcarepetugas.util.ViewWeightAnimationWrapper;
 
 import java.util.ArrayList;
@@ -65,8 +60,6 @@ public class MapActivity extends AppCompatActivity
     private static final String TAG = "MapActivity";
     private static final int MAP_LAYOUT_STATE_CONTRACTED = 0;
     private static final int MAP_LAYOUT_STATE_EXPANDED = 1;
-    private static final int LOCATION_UPDATE_INTERVAL = 1000;
-
 
     //widgets
     private RecyclerView mWargaListRecyclerView;
@@ -93,15 +86,6 @@ public class MapActivity extends AppCompatActivity
     private LatLngBounds mMapBoundary;
     private LokasiPetugas mPosisiPetugas;
     private GeoApiContext mGeoApiContext = null;
-
-    private Handler mHandler = new Handler();
-    private Runnable mRunnable;
-
-
-    private ClusterManager mClusterManager;
-    private MyClusterManagerRenderer mClusterManagerRenderer;
-    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -210,7 +194,9 @@ public class MapActivity extends AppCompatActivity
 
     private void setCameraView() {
 
-        db.collection("Lokasi Petugas").document(FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        db.collection("Lokasi Petugas")
+                .document(((UserClient)(getApplicationContext())).getPetugas().getId_petugas())
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {

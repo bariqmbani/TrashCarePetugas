@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PageArtikel">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarPageArtikel"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:theme="@style/ToolbarTheme">
+
+        <TextView
+            android:id="@+id/tvToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="71dp"
+            android:gravity="center_vertical"
+            android:text="Artikel"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </android.support.v7.widget.Toolbar>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbarPageArtikel"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvJudulArt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textColor="#000"
+            android:text="Ini judul artikelnya" />
+
+        <ImageView
+            android:id="@+id/ivArtikelImg"
+            android:layout_width="400dp"
+            android:layout_height="200dp"
+            android:layout_below="@id/tvSumber"
+            android:background="#ff00"
+            android:text="Technopreneur 2019"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp" />
+
+
+        <TextView
+            android:id="@+id/tvSumber"
+            android:layout_below="@id/tvJudulArt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#000"
+            android:text="Sumber : " />
+
+        <TextView
+            android:id="@+id/tvIsiArt"
+            android:layout_below="@id/ivArtikelImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:textColor="#000"
+            android:text="Ini isi dari artikelnya" />
+
+    </RelativeLayout>
+</RelativeLayout>

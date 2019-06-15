@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
 
     private Button btnFeedback, btnArtikel, btnMaps;
     private ImageView imgLogout;
-    private TextView logout;
+    private TextView logout, tvNama, tvAlamat;
     //public MenuItem item;
 
     FirebaseFirestore db;
@@ -74,15 +74,25 @@ public class MainActivity extends AppCompatActivity
 
         checkMapServices();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
         mFunctions = FirebaseFunctions.getInstance();
         db = FirebaseFirestore.getInstance();
+
         id = getIntent().getExtras().getString("ID");
-        Log.d(TAG, id);
+        tvNama = findViewById(R.id.tvNama);
+        tvAlamat = findViewById(R.id.tvAlamat);
+        displayPetugasDetail();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         btnFeedback = findViewById(R.id.btnFeedback);
         btnFeedback.setOnClickListener(new View.OnClickListener() {
@@ -111,15 +121,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         imgLogout = findViewById(R.id.imgLogout);
         logout = findViewById(R.id.logout);
 
@@ -137,6 +138,24 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+    }
+
+    private void displayPetugasDetail() {
+        DocumentReference wargaRef = db.collection("petugas").document(id);
+        wargaRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult();
+                    StringBuilder fieldNama = new StringBuilder();
+                    StringBuilder fieldAlamat = new StringBuilder();
+                    fieldNama.append(doc.get("nama"));
+                    fieldAlamat.append(doc.get("alamat"));
+                    tvNama.setText(fieldNama.toString());
+                    tvAlamat.setText(fieldAlamat.toString());
+                }
+            }
+        });
     }
 
 //    @SuppressWarnings("StatementWithEmptyBody")
@@ -243,11 +262,8 @@ public class MainActivity extends AppCompatActivity
     private void saveUserLocation() {
 
         if (mLokasiPetugas != null) {
-            //DocumentReference locationRef = db.collection("Lokasi Warga").document(FirebaseDatabase.getInstance().getReference().child("warga").toString());
 
-            //DocumentReference wargaRef = db.collection("warga").get();
-
-            DocumentReference locationRef = db.collection("Lokasi Petugas").document(FirebaseAuth.getInstance().getUid());
+            DocumentReference locationRef = db.collection("Lokasi Petugas").document(id);
 
             locationRef.set(mLokasiPetugas).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
