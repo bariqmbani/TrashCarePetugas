@@ -1,6 +1,5 @@
 package com.unpad.trashcarepetugas;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +7,6 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -61,7 +59,6 @@ public class PageArtikel extends AppCompatActivity {
                             tvJudul.setText(fieldJudul.toString());
                             tvSumber.setText(fieldSumber.toString());
                             tvIsi.setText(fieldIsi.toString());
-                            Glide.with(context)
                         }
                     }
                 }
