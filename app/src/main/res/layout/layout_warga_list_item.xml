@@ -18,16 +18,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="#000000"
+            android:textSize="20sp"
+            android:text="Nama"
             android:id="@+id/nama"
             tools:ignore="MissingConstraints" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:textSize="16sp"
             android:textColor="#929292"
+            android:text="Alamat"
             app:layout_constraintTop_toBottomOf="@+id/nama"
             android:layout_marginTop="5dp"
             android:id="@+id/alamat"

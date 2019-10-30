@@ -1,0 +1,47 @@
+[33mcommit fc956038d9abdb3ad2f73a9171d0bbacf61e8787[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Tue Jun 11 23:23:26 2019 +0700
+
+    direction without polyline
+
+[33mcommit 35ea8bdc7fd63efa82587f1b9bc68b54fdc3df47[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Tue Jun 11 23:22:37 2019 +0700
+
+    direction without polyline
+
+[33mcommit 7b905c025275225da6b628a011f424409c1486b1[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Mon Jun 10 21:48:03 2019 +0700
+
+    expand map view
+
+[33mcommit 27c6f4f2241b5e051975ddfa9f93526c76a73bf6[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Mon Jun 10 21:01:24 2019 +0700
+
+    location service gps updates
+
+[33mcommit 109f609a84bdd3dafc1a6b045b753e08990213d4[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Sat Jun 8 19:33:40 2019 +0700
+
+    add markers and custom map
+
+[33mcommit d5f518771ce46f4adc46070281d3fd6d24ebde0d[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Sat Jun 8 08:47:08 2019 +0700
+
+    cluster for marker
+
+[33mcommit 0a3941a484c92e424c8e40de9daddbe6d0350c7c[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Sat Jun 8 00:12:54 2019 +0700
+
+    add
+
+[33mcommit 28bf498a3466e881f89b31a532ed52a12e37d76c[m
+Author: Bariq Mbani <bariq.m70@gmail.com>
+Date:   Fri May 31 04:44:31 2019 +0700
+
+    Initial commit

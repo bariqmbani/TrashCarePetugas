@@ -23,7 +23,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PageArtikel"></activity>
+        <activity android:name=".DaftarWargaActivity"></activity>
+        <activity android:name=".PageArtikel" />
         <activity android:name=".MapActivity">
             <intent-filter>
                 <action android:name="MAPS" />
@@ -48,7 +49,7 @@
         <activity android:name=".FeedbackActivity" />
         <activity android:name=".ArtikelActivity" />
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".PageArtikel"/>
+        <activity android:name=".PageArtikel" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -63,7 +64,7 @@
 
         <service
             android:name=".services.LocationService"
-            android:stopWithTask="true"></service>
+            android:stopWithTask="true" />
         <service
             android:name=".services.MyFirebaseMessagingService"
             android:exported="false">

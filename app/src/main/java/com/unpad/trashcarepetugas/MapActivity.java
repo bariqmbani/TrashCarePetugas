@@ -1,8 +1,8 @@
 package com.unpad.trashcarepetugas;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -11,13 +11,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -47,7 +44,7 @@ import com.google.maps.model.DirectionsResult;
 import com.unpad.trashcarepetugas.adapters.WargaRecyclerAdapter;
 import com.unpad.trashcarepetugas.models.LokasiPetugas;
 import com.unpad.trashcarepetugas.models.LokasiWarga;
-import com.unpad.trashcarepetugas.util.ViewWeightAnimationWrapper;
+import com.unpad.trashcarepetugas.models.Pemberitahuan;
 
 import java.util.ArrayList;
 
@@ -55,24 +52,14 @@ import static com.unpad.trashcarepetugas.util.Constants.MAPVIEW_BUNDLE_KEY;
 
 
 public class MapActivity extends AppCompatActivity
-        implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
+        implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private static final String TAG = "MapActivity";
-    private static final int MAP_LAYOUT_STATE_CONTRACTED = 0;
-    private static final int MAP_LAYOUT_STATE_EXPANDED = 1;
-
-    //widgets
-    private RecyclerView mWargaListRecyclerView;
     private MapView mMapView;
-    private RelativeLayout mMapContainer;
 
-
-    TextView nama, alamat;
-    ImageButton fullscreen;
+    ImageView list_warga;
     String id;
 
-
-    //vars
     private ArrayList<LokasiWarga> wargas = new ArrayList<>();
     private WargaRecyclerAdapter mWargaRecyclerAdapter;
     
@@ -97,22 +84,28 @@ public class MapActivity extends AppCompatActivity
         id = getIntent().getExtras().getString("ID");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        mMapContainer = findViewById(R.id.map_container);
-        mWargaListRecyclerView = findViewById(R.id.warga_list_recycler_view);
         mMapView = findViewById(R.id.warga_list_map);
+        list_warga = findViewById(R.id.list_warga);
 
-        nama = findViewById(R.id.nama);
-        alamat = findViewById(R.id.alamat);
+        list_warga.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MapActivity.this, DaftarWargaActivity.class);
+                startActivity(i);
+            }
+        });
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mWargaListRecyclerView.setLayoutManager(layoutManager);
-
-        fullscreen = findViewById(R.id.btn_full_screen_map);
-        fullscreen.setOnClickListener(this);
-
-        initWargaListRecyclerView();
         initGoogleMap(savedInstanceState);
+        Toolbar toolbar = findViewById(R.id.toolbarMaps);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private void initGoogleMap(Bundle savedInstanceState) {
@@ -164,30 +157,6 @@ public class MapActivity extends AppCompatActivity
             public void onFailure(Throwable e) {
                 Log.e(TAG, "calculateDirections: Failed to get directions: " + e.getMessage() );
                 Toast.makeText(MapActivity.this,"Google API melebihi limit", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void initWargaListRecyclerView() {
-         db.collection("Lokasi Warga").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    wargas = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d(TAG, document.getId() + " => " + document.getData());
-                        LokasiWarga lokasiWarga = document.toObject(LokasiWarga.class);
-                        if (lokasiWarga.getWarga().isRequest() != false) {
-                            wargas.add(lokasiWarga);
-                        }
-                    }
-                    mWargaRecyclerAdapter = new WargaRecyclerAdapter(wargas);
-                    mWargaListRecyclerView.setAdapter(mWargaRecyclerAdapter);
-                    mWargaRecyclerAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
-//                    Toast.makeText(this, "gagal", Toast.LENGTH_SHORT).show();
-                }
             }
         });
     }
@@ -319,64 +288,6 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_full_screen_map:{
-
-                if(mMapLayoutState == MAP_LAYOUT_STATE_CONTRACTED){
-                    mMapLayoutState = MAP_LAYOUT_STATE_EXPANDED;
-                    expandMapAnimation();
-                }
-                else if(mMapLayoutState == MAP_LAYOUT_STATE_EXPANDED){
-                    mMapLayoutState = MAP_LAYOUT_STATE_CONTRACTED;
-                    contractMapAnimation();
-                }
-                break;
-            }
-
-        }
-    }
-
-    private void expandMapAnimation(){
-        ViewWeightAnimationWrapper mapAnimationWrapper = new ViewWeightAnimationWrapper(mMapContainer);
-        ObjectAnimator mapAnimation = ObjectAnimator.ofFloat(mapAnimationWrapper,
-                "weight",
-                50,
-                100);
-        mapAnimation.setDuration(800);
-
-        ViewWeightAnimationWrapper recyclerAnimationWrapper = new ViewWeightAnimationWrapper(mWargaListRecyclerView);
-        ObjectAnimator recyclerAnimation = ObjectAnimator.ofFloat(recyclerAnimationWrapper,
-                "weight",
-                50,
-                0);
-        recyclerAnimation.setDuration(800);
-
-        recyclerAnimation.start();
-        mapAnimation.start();
-    }
-
-    private void contractMapAnimation(){
-        ViewWeightAnimationWrapper mapAnimationWrapper = new ViewWeightAnimationWrapper(mMapContainer);
-        ObjectAnimator mapAnimation = ObjectAnimator.ofFloat(mapAnimationWrapper,
-                "weight",
-                100,
-                50);
-        mapAnimation.setDuration(800);
-
-        ViewWeightAnimationWrapper recyclerAnimationWrapper = new ViewWeightAnimationWrapper(mWargaListRecyclerView);
-        ObjectAnimator recyclerAnimation = ObjectAnimator.ofFloat(recyclerAnimationWrapper,
-                "weight",
-                0,
-                50);
-        recyclerAnimation.setDuration(800);
-
-        recyclerAnimation.start();
-        mapAnimation.start();
-    }
-
-
-    @Override
     public void onInfoWindowClick(final Marker marker) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
         builder.setMessage("Anda ingin mengangkut sampah di " + marker.getSnippet() + "?")
@@ -397,7 +308,7 @@ public class MapActivity extends AppCompatActivity
                                         Log.d(TAG, document.getId() + lokasiWarga.getWarga().getNama() + position + "\n");
                                         wargas.add(lokasiWarga);
                                         if (position.equals(marker.getPosition())) {
-                                            String idWarga = lokasiWarga.getWarga().getId_warga();
+                                            final String idWarga = lokasiWarga.getWarga().getId_warga();
                                             Log.d(TAG, "id warga: " + idWarga);
                                             final DocumentReference wargaRef = db.collection("warga").document(idWarga);
                                             wargaRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -405,6 +316,11 @@ public class MapActivity extends AppCompatActivity
                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                     if (documentSnapshot.exists()) {
                                                         wargaRef.update("request", false);
+
+                                                        String pengirim = ((UserClient)(getApplicationContext())).getPetugas().getNama();
+                                                        Pemberitahuan pemberitahuan = new Pemberitahuan(pengirim, idWarga,null);
+
+                                                        db.collection("pemberitahuan_warga").document().set(pemberitahuan);
                                                     }
                                                 }
                                             });
